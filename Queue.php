@@ -36,10 +36,10 @@ class Queue extends Component
      * @param $messageBody 消息内容
      * @return bool 成功或失败
      */
-    public function send($messageBody)
+    public function send($messageBody, $delaySeconds = NULL)
     {
         try {
-            $request = new SendMessageRequest($messageBody);
+            $request = new SendMessageRequest($messageBody, $delaySeconds);
             $this->queue->sendMessage($request);
             return true;
         } catch (MnsException $e) {
@@ -68,8 +68,8 @@ class Queue extends Component
             return true;
         } catch (MnsException $e) {
             Yii::error("消息发送错误({$e->getMnsErrorCode()}): {$e->getRequestId()}\n{$e->getMessage()}\n{$e->getTraceAsString()}}", 'mns.send_batch');
-            return false;
         }
+        return false;
     }
 
     /**
