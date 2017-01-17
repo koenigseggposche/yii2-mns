@@ -77,7 +77,7 @@ class Queue extends Component
      * @param $waitSeconds 等待的秒数
      * @return string 消息内容
      */
-    public function receive($waitSeconds = null)
+    public function receive($waitSeconds = 10)
     {
         try {
             $res = $this->queue->receiveMessage($waitSeconds);
@@ -86,7 +86,9 @@ class Queue extends Component
             $this->queue->deleteMessage($receiptHandle);
             return $messageBody;
         } catch (MnsException $e) {
-            Yii::error("消息发送错误({$e->getMnsErrorCode()}): {$e->getRequestId()}\n{$e->getMessage()}\n{$e->getTraceAsString()}}", 'mns.receive');
+            if ($e->getMnsErrorCode() != 'MessageNotExist') {
+                Yii::error("消息发送错误({$e->getMnsErrorCode()}): {$e->getRequestId()}\n{$e->getMessage()}\n{$e->getTraceAsString()}}", 'mns.receive');
+            }
         }
         return null;
     }
@@ -96,7 +98,7 @@ class Queue extends Component
      * @param $waitSeconds 等待的秒数
      * @return string 消息内容
      */
-    public function receiveBatch($numOfMessages = 16, $waitSeconds = null)
+    public function receiveBatch($numOfMessages = 16, $waitSeconds = 10)
     {
         $messageBodys = [];
         try {
@@ -116,7 +118,9 @@ class Queue extends Component
                 }
             }
         } catch (MnsException $e) {
-            Yii::error("消息接收错误({$e->getMnsErrorCode()}): {$e->getRequestId()}\n{$e->getMessage()}\n{$e->getTraceAsString()}}", 'mns.receive_batch');
+            if ($e->getMnsErrorCode() != 'MessageNotExist') {
+                Yii::error("消息接收错误({$e->getMnsErrorCode()}): {$e->getRequestId()}\n{$e->getMessage()}\n{$e->getTraceAsString()}}", 'mns.receive_batch');
+            }
         }
         return $messageBodys;
     }
