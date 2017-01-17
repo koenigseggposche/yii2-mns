@@ -56,6 +56,7 @@ class Queue extends Component
     public function sendBatch($messageBodys, $delaySeconds = NULL, $priority = NULL)
     {
         try {
+            $messageBodys = (array) $messageBodys;
             $messageBodyss = array_chunk($messageBodys, 16);
             foreach ($messageBodyss as $messageBodys) {
                 $items = [];
